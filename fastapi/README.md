@@ -1,5 +1,3 @@
-# skill-tree
-
 ## Запуск
 1. Запустить скрипт командой из папки fastapi: `sh ./bashscripts/start.sh`
 
