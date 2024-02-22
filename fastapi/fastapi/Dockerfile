@@ -10,5 +10,5 @@ RUN pip install -r requirements.txt
 
 
 COPY . .
-
-ENTRYPOINT ["/fastapi/entrypoint.sh"]
+CMD ["tail", "-f", "/dev/null"]
+# ENTRYPOINT ["/fastapi/entrypoint.sh"]
