@@ -32,8 +32,8 @@ async def post_washer(user: AuthUser = Depends(get_current_user), session: Async
     proccess = await check_user_in_queue(session, user)
     if (proccess == None):
         raise HTTPException(status_code=404, detail="User not in queue!")
-    if (proccess.washer_id != None):
-        raise HTTPException(status_code=400, detail="Washing can not be canceled, because it is running!")\
+    # if (proccess.washer_id != None):
+    #     raise HTTPException(status_code=403, detail="Washing can not be canceled, because it is running!")
         
     await delete_washer_queue(session, proccess)
     
