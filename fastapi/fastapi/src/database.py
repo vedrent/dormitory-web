@@ -1,11 +1,9 @@
-from sqlmodel import SQLModel, select
+from sqlmodel import select
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from typing import List
 from src.config import DEFAULT_ADMIN_USERNAME, DEFAULT_ADMIN_PASSWORD
 from src.auth.models import AuthUser, Role
-from src.laundry.models import Washer
 from src.auth.utils import get_password_hash
 from src import engine
 
@@ -31,10 +29,3 @@ async def add_admin(session: AsyncSession):
         admin = AuthUser(username=DEFAULT_ADMIN_USERNAME, password=hashed_password, role=Role.admin)
         session.add(admin)
         await session.commit()
-
-
-async def read_washers(session: AsyncSession) -> List[Washer]:
-    statement = select(Washer)
-    result = await session.execute(statement)
-    return result.scalars().all()
-    
