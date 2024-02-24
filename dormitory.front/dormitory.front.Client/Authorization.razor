@@ -1,0 +1,50 @@
+﻿@page "/"
+
+<EditForm id="auth-form" Model="@authData" @OnSubmit="Submit" FormName="auth-form">
+    <div class="app-icon auth-icon"></div>
+    <h1>Авторизация</h1>
+    <section class="input-group">
+        <InputText placeholder="Логин" @bind-Value="authData.Login" style="border-bottom: 2px solid var(--gray)" />
+       
+        <InputText placeholder="Пароль" type="password" @bind-Value="authData.Password" />
+    </section>
+    <button type="submit" id="submit" class="submit-button">Войти</button>
+    <a href="/signup" class="submit-button">Создать аккаунт</a>
+    <footer>
+        <div class="app-icon"></div>
+        <a>Техническая поддержка</a>
+        <span>&copy; 2024 - Crazy developers</span>
+    </footer>
+</EditForm>
+
+<style>
+    #auth-form {
+        width: 400px;
+        margin: 0 auto;
+        position: relative;
+        height: 100%;
+        
+    }
+
+    input {
+        all: unset;
+        font-size: 18px;
+        padding: 0.4em;
+    }
+
+
+</style>
+
+@code {
+    AuthData authData = new();
+    void Submit()
+    {
+
+    }
+    public class AuthData
+    {
+        public string Login { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}
+

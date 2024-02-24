@@ -1,0 +1,61 @@
+﻿.auth-icon {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 50px;
+}
+
+
+
+h1
+{
+    text-align: center;
+    font-weight: 700;
+    font-size: 36px
+}
+
+.input-group
+{
+    height: fit-content;
+    border: 2px solid var(--gray);
+    display:flex;
+    flex-direction: column;
+    border-radius: 10px;
+}
+
+.submit-button {
+    display: block !important;
+    all: unset;
+    width: 350px;
+    padding: 15px;
+    margin: 15px auto;
+  
+    background-color: var(--blue);
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    border-radius: 13px;
+    text-align: center;
+    border: 2px solid #030301
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+a
+{
+    text-decoration: underline;
+    font-weight: 500;
+    
+}
+a, span{
+   
+    height: fit-content;
+    align-self: center
+}
