@@ -2,7 +2,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.database import get_session
-from src.laundry.utils import read_washers, read_queue_position, insert_washer_queue, check_user_in_queue, delete_washer_queue
+from src.laundry.utils import read_washers, read_queue_position, insert_washer_queue, check_user_in_queue, delete_washer_queue, start_washering
 
 from src.auth.models import AuthUser, Role
 from src.auth.dependencies import get_current_user
@@ -19,6 +19,7 @@ async def check_washer(user: AuthUser = Depends(get_current_user), session: Asyn
     
     return LaundryGetScheme(washers = washers, queue_position = pos)
 
+
 @laundry_router.post("/laundry")
 async def post_washer(user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     user_proccess = await check_user_in_queue(session, user)
@@ -27,13 +28,28 @@ async def post_washer(user: AuthUser = Depends(get_current_user), session: Async
 
     await insert_washer_queue(session, user)
 
+
+@laundry_router.put("/laundry")
+async def finish_washing(user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    proccess = await check_user_in_queue(session, user)
+
+    if (proccess == None):
+        raise HTTPException(status_code=404, detail="User not in laundry!")
+    if (proccess.washer_id == None):
+        raise HTTPException(status_code=400, detail="Your washing is not started")
+        
+    await delete_washer_queue(session, proccess)
+    await start_washering(session, proccess.washer_id)
+
+
 @laundry_router.delete("/laundry")
 async def post_washer(user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     proccess = await check_user_in_queue(session, user)
     if (proccess == None):
         raise HTTPException(status_code=404, detail="User not in queue!")
-    # if (proccess.washer_id != None):
-    #     raise HTTPException(status_code=403, detail="Washing can not be canceled, because it is running!")
+    # This part is commited for debug and test, must be uncommented on release
+    if (proccess.washer_id != None):
+        raise HTTPException(status_code=400, detail="Washing can not be canceled, because it is running!")
         
     await delete_washer_queue(session, proccess)
     
