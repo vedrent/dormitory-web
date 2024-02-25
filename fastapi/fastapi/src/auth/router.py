@@ -34,9 +34,9 @@ async def signup(form_data: SignupUserSchema, session: AsyncSession = Depends(ge
 
 
 @auth_router.post("/login", response_model=TokenSchema)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_session)):
-    user = await get_user_by_username(form_data.username, session)
-    if not user or not verify_password(form_data.password, user.password):
+async def login(login_request: SignupUserSchema, session: AsyncSession = Depends(get_session)):
+    user = await get_user_by_username(login_request.username, session)
+    if not user or not verify_password(login_request.password, user.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     access_token = create_access_token(user.id, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
