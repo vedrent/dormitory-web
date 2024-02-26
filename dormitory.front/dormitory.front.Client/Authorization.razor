@@ -1,18 +1,18 @@
-﻿@page "/"
-
-<EditForm id="auth-form" Model="@authData" @OnSubmit="Submit" FormName="auth-form">
+﻿@page "/auth"
+@rendermode RenderMode.InteractiveWebAssembly
+@inject HttpClient httpClient;
+<EditForm id="auth-form" Model="authData" OnSubmit="@Submit" FormName="auth-form">
     <div class="app-icon auth-icon"></div>
     <h1>Авторизация</h1>
     <section class="input-group">
-        <InputText placeholder="Логин" @bind-Value="authData.Login" style="border-bottom: 2px solid var(--gray)" />
-       
-        <InputText placeholder="Пароль" type="password" @bind-Value="authData.Password" />
+        <InputText placeholder="Логин"  @bind-Value="authData.username" style="border-bottom: 2px solid var(--gray)" />
+        <InputText placeholder="Пароль" type="password" @bind-Value="authData.password" />
     </section>
     <button type="submit" id="submit" class="submit-button">Войти</button>
     <a href="/signup" class="submit-button">Создать аккаунт</a>
     <footer>
         <div class="app-icon"></div>
-        <a>Техническая поддержка</a>
+        <a>Техническая поддержка </a>
         <span>&copy; 2024 - Crazy developers</span>
     </footer>
 </EditForm>
@@ -21,6 +21,7 @@
     #auth-form {
         width: 400px;
         margin: 0 auto;
+        padding: 50px 0;
         position: relative;
         height: 100%;
         
@@ -36,15 +37,18 @@
 </style>
 
 @code {
-    AuthData authData = new();
-    void Submit()
-    {
 
-    }
+        AuthData authData = new();
+
+        async Task Submit()
+        {
+            var response = await httpClient.PostAsJsonAsync("/login", authData);
+        }
+
     public class AuthData
     {
-        public string Login { get; set; } = "";
-        public string Password { get; set; } = "";
+        public string username { get; set; } = "";
+        public string password { get; set; } = "";
     }
-}
 
+}
