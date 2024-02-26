@@ -13,10 +13,10 @@ class Lodger(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     room_id: int
     user_id: int
-    password_id: int
+    passport_id: int
 
 
-class Password(SQLModel, table=True):
+class Passport(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str
     lastname: str
