@@ -3,8 +3,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List
 
 from src.lodgers.models import Room
-from src.auth.models import AuthUser
-
 
 async def check_room_exists(room: Room, session: AsyncSession) -> bool:
     statement = select(Room).where(Room.number == room.number and Room.floor == room.floor)
