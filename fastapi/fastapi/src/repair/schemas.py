@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class RepairClaimScheme(BaseModel):
-    room_id: int
     description: str
     open_date: datetime 
     close_date: datetime

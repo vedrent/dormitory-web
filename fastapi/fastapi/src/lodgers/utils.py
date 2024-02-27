@@ -38,7 +38,7 @@ async def insert_lodger(lodger: Lodger, session: AsyncSession):
     await session.commit()
 
 
-async def read_lodger_by_user_id(id: int, session: AsyncSession) -> Lodger:
+async def read_lodger_by_user_id(session: AsyncSession, id: int) -> Lodger:
     lodger = select(Lodger).where(Lodger.user_id == id)
     lodger = await session.execute(lodger)
     return lodger.scalars().first()
