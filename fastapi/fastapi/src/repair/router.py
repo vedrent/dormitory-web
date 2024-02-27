@@ -8,7 +8,7 @@ from src.auth.dependencies import get_current_user
 from src.repair.schemas import RepairClaimScheme, ReadRoomClaim
 from src.repair.models import Repair_list
 from src.repair.utils import insert_repair_list, read_repair_list_by_room, read_repair_list_by_id, delete_repair_list
-from src.lodgers.utils import read_lodger_by_user_id
+from src.lodgers.utils import read_lodger_by_user_id, read_lodgers_by_room_id
 
 from src.database import get_session
 
@@ -45,7 +45,16 @@ async def create_claim(repair_scheme: RepairClaimScheme, user: AuthUser = Depend
 @repair_router.delete(base_url + "/{claim_id}")
 async def delete_claim(claim_id: int, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     claim = await read_repair_list_by_id(session, claim_id)
-    if (not claim_id):
+    if (not claim):
         raise HTTPException(status_code=404, detail="Repair claim not found!")
+    
+    lodgers = await read_lodgers_by_room_id(session, claim.room_id)
+    user_ids = [l.user_id for l in lodgers]
+
+    print("print")
+    print(user_ids)
+
+    if (user.id not in user_ids):
+        raise HTTPException(status_code=403, detail="This claim is not attached to your room!")
 
     await delete_repair_list(session, claim)

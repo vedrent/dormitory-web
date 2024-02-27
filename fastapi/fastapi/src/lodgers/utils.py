@@ -42,3 +42,9 @@ async def read_lodger_by_user_id(session: AsyncSession, id: int) -> Lodger:
     lodger = select(Lodger).where(Lodger.user_id == id)
     lodger = await session.execute(lodger)
     return lodger.scalars().first()
+
+
+async def read_lodgers_by_room_id(session: AsyncSession, id: int) -> List[Lodger]:
+    lodger = select(Lodger).where(Lodger.room_id == id)
+    lodger = await session.execute(lodger)
+    return lodger.scalars().all()

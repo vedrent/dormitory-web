@@ -15,7 +15,7 @@ async def read_repair_list_by_room(session: AsyncSession, room_id: int) -> List[
     return statement.scalars().all()
 
 
-async def read_repair_list_by_id(session: AsyncSession, claim_id: int) -> List[Repair_list]:
+async def read_repair_list_by_id(session: AsyncSession, claim_id: int) -> Repair_list:
     statement = select(Repair_list).where(Repair_list.id == claim_id)
     statement = await session.execute(statement)
     return statement.scalars().first()
