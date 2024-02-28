@@ -7,4 +7,4 @@ class Repair_list(SQLModel, table=True):
     room_id: int
     description: str
     open_date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    close_date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    close_date: datetime = Field(nullable=True)
