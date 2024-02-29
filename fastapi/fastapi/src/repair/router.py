@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.auth.models import AuthUser
 from src.auth.dependencies import get_current_user
 
-from src.repair.schemas import RepairClaimScheme, ReadRoomClaim, GetRepairScheme, ClaimScheme
+from src.repair.schemas import RepairClaimScheme, ReadRoomClaim, GetRepairScheme, ClaimScheme, RequestFloorRepairScheme
 from src.repair.models import Repair_list
-from src.repair.utils import insert_repair_list, read_opened_claims_by_room, read_repair_list_by_id, delete_repair_list, finish_repair_list
+from src.repair.utils import insert_repair_list, read_opened_claims_by_room, read_opened_claims_by_floor, read_repair_list_by_id, delete_repair_list, finish_repair_list, create_get_repair_schemas
 from src.lodgers.utils import read_lodger_by_user_id, read_lodgers_by_room_id
 
 from src.auth.models import Role
@@ -26,16 +26,18 @@ request_url = base_url + "/claims"
 async def get_room_claims(room_id: int, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     repairs = await read_opened_claims_by_room(session, room_id)
 
-    def prepairClaim(c: Repair_list):
-        return ClaimScheme(
-            id = c.id,
-            room_id = c.room_id,
-            description = c.description,
-            open_date = c.open_date,
-            close_date = c.close_date
-        )
+    result = create_get_repair_schemas(repairs)
+    return GetRepairScheme(list=result)
 
-    result = list(map(prepairClaim, repairs))
+
+@repair_router.get(base_url, response_model=GetRepairScheme)
+async def get_room_claims(scheme: RequestFloorRepairScheme, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    if (user.role != Role.admin):
+        raise HTTPException(status_code=403, detail="You are not an admin!")
+    
+    repairs = await read_opened_claims_by_floor(session, scheme.floor)
+
+    result = create_get_repair_schemas(repairs)
     return GetRepairScheme(list=result)
 
 

@@ -32,7 +32,7 @@ async def create_room(scheme: CreateRoomScheme, user: AuthUser = Depends(get_cur
 @lodgers_router.post(base_url)
 async def registrate_lodger(scheme: RegistrateLodgerScheme, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     print(user.username)
-    lodger_exists = await read_lodger_by_user_id(user.id, session)
+    lodger_exists = await read_lodger_by_user_id(session, user.id)
     if lodger_exists:
         raise HTTPException(status_code=400, detail="Lodger already exists!")
     

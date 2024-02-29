@@ -22,3 +22,6 @@ class ClaimScheme(BaseModel):
 
 class GetRepairScheme(BaseModel):
     list: List[ClaimScheme]
+
+class RequestFloorRepairScheme(BaseModel):
+    floor: int
