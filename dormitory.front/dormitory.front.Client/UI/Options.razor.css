@@ -1,0 +1,77 @@
+﻿.service-icon {
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 330px;
+    height: 212px;
+    margin: auto 0;
+}
+
+
+.service-title {
+    margin-bottom: 20px;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.service-button {
+    background-color: #ffda3c;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 20px;
+    cursor: pointer;
+    height: fit-content;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.service-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-icon {
+    padding: 0 20px;
+    background-image: url("./static/icons/form.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 10px;
+    width: 10px;
+}
+
+.slide-button {
+    position: absolute;
+    display: block;
+    height: 100px;
+    width: 100px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    margin: 20px 20px;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: transparent;
+}
+
+.left {
+    left: 0;
+    background-image: url("./static/icons/arrLeft.png");
+
+}
+.right {
+    right: 0;
+    background-image: url("./static/icons/arrRight.png");
+}
+
+button
+{
+    all: unset;
+    border-radius: 100%
+}
+    button:hover {
+       
+    }
