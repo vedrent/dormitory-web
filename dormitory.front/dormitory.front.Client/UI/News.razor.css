@@ -1,0 +1,27 @@
+﻿.news-block {
+    background-color: #f1f1f1;
+    padding: 20px;
+    margin: 50px;
+    border-radius:10px;
+}
+
+.news-block h2 {
+    color: #000;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+ .news-block p {
+        color: #333;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+.learn-more {
+    color: #0066cc;
+    font-size: 16px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+    .learn-more:hover {
+        text-decoration: underline;
+    }

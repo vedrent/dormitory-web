@@ -1,0 +1,16 @@
+﻿@rendermode RenderMode.InteractiveWebAssembly
+<div class="news-block">
+    <h2 class="lmao">@header</h2>
+    <p class="kekw">@description</p>
+    <div style="text-align:right;"><a href="@link" class="learn-more">Узнать больше →</a></div>
+</div>
+
+@code {
+    [Parameter]
+    public string header{ get; set; }
+    [Parameter]
+    public string description{ get; set; }
+    [Parameter]
+    public string link { get; set; }
+
+}
