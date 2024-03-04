@@ -43,11 +43,15 @@ async def insert_washer_queue(session: AsyncSession, user: AuthUser):
 
     if (1 in statuses):
         choosed_washer = washers[statuses.index(1)]
-    
-    inserted = Washer_Queue(user_id = user.id, washer_id = choosed_washer.id)
+
+    if not choosed_washer:
+        inserted = Washer_Queue(user_id = user.id, washer_id = None)
+    else:
+        inserted = Washer_Queue(user_id = user.id, washer_id = choosed_washer.id)
+        await update_washer_status(session, choosed_washer, 2)
+
     session.add(inserted)
     await session.commit()
-    await update_washer_status(session, choosed_washer, 2)
 
 
 async def delete_washer_queue(session: AsyncSession, washing: Washer_Queue):
@@ -56,8 +60,21 @@ async def delete_washer_queue(session: AsyncSession, washing: Washer_Queue):
         await update_washer_status(session, await read_washer(session, washing.washer_id), 1)
     await session.commit()
 
+
 async def update_washer_status(session: AsyncSession, washer: Washer, status: int):
     washer.status = status
     session.add(washer)
     await session.commit()
 
+
+async def start_washering(session: AsyncSession, washer_id: int):
+    proccess = select(Washer_Queue).where(Washer_Queue.washer_id == None)
+    proccess = await session.execute(proccess)
+    proccess = proccess.scalars().first()
+
+    if (not proccess):
+        return
+    
+    proccess.washer_id = washer_id
+    session.add(proccess)
+    await session.commit()
