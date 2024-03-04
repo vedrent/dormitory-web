@@ -4,13 +4,15 @@
 @rendermode RenderMode.InteractiveWebAssembly
 
 <Navbar/>
-
-
-    <Options options=@options/>
-
+<Options options=@options/>
+<NewsItem/>
 @code {
-    List<Option> options = [
-        new Option("Запись на стиральную машину","Встать в очередь","./static/icons/stiralka.png"),
-    new Option("Запись на ремонт","Записаться на ремонт","./static/icons/repair.png")
+    List<OptionModel> options = [
+        new OptionModel("Запись на стиральную машину","Встать в очередь","./static/icons/stiralka.png"),
+    new OptionModel("Запись на ремонт","Записаться на ремонт","./static/icons/repair.png")
+    ];
+    List<NewsItemModel> NewsItems =
+    [
+        new NewsItemModel()
     ];
 }

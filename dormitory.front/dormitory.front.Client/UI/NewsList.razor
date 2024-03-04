@@ -1,0 +1,11 @@
+﻿@using dormitory.front.Client.model
+
+<Virtualize Items="@newsList">
+
+</Virtualize>
+@code {
+    [EditorRequired]
+    [Parameter]
+    public List<NewsItem> newsList { get; set; }
+
+}

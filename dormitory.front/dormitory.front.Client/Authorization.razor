@@ -42,7 +42,9 @@
 
         async Task Submit()
         {
-            var response = await httpClient.PostAsJsonAsync("/login", authData);
+            Console.WriteLine("Submit started");
+            var response = await httpClient.PostAsJsonAsync("http://localhost:6981/login", authData);
+            Console.WriteLine(response.Content);
         }
 
     public class AuthData

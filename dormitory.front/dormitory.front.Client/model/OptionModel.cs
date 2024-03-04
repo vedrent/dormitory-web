@@ -1,12 +1,12 @@
 ﻿namespace dormitory.front.Client.model
 {
-    public class Option
+    public class OptionModel
     {
         public string Title { get; set; }
         public string Description { get; set; }
         public string IconUrl { get; set; }
 
-        public Option(string title, string description, string iconUrl) {
+        public OptionModel(string title, string description, string iconUrl) {
             Title = title;
             Description = description;
             IconUrl = iconUrl;

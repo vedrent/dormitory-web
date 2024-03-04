@@ -1,0 +1,13 @@
+﻿@using dormitory.front.Client.model
+<section class="news-item">
+    <header>@Item.Title</header>
+    <main>@Item.Source</main>
+    <footer>
+        <a>Узнать больше</a>
+    </footer>
+</section>
+@code {
+    [EditorRequired]
+    [Parameter]
+    public NewsItemModel Item { get; set; }
+}
