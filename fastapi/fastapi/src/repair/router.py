@@ -4,12 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.auth.models import AuthUser
 from src.auth.dependencies import get_current_user
 
-from src.repair.schemas import RepairClaimScheme, ReadRoomClaim, GetRepairScheme, ClaimScheme, RequestFloorRepairScheme
+from src.repair.schemas import RepairClaimScheme, ReadRoomClaim, GetRepairScheme, ClaimScheme
 from src.repair.models import Repair_list
 from src.repair.utils import insert_repair_list, read_opened_claims_by_room, read_opened_claims_by_floor, read_repair_list_by_id, delete_repair_list, finish_repair_list, create_get_repair_schemas
 from src.lodgers.utils import read_lodger_by_user_id, read_lodgers_by_room_id
 
 from src.auth.models import Role
+from src.lodgers.models import Lodger
 
 from src.database import get_session
 from src.config import REPAIR_CLAIMS_LIMIT
@@ -22,20 +23,25 @@ base_url = "/repair"
 request_url = base_url + "/claims"
 
 
-@repair_router.get(base_url + "/{room_id}", response_model=GetRepairScheme)
-async def get_room_claims(room_id: int, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
-    repairs = await read_opened_claims_by_room(session, room_id)
+@repair_router.get(base_url, response_model=GetRepairScheme)
+async def get_room_claims(user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+
+    lodger: Lodger = await read_lodger_by_user_id(session, user.id)
+    if (not lodger):
+        raise HTTPException(status_code=404, detail="Lodger are not found! Try registrate lodger at first.")
+
+    repairs = await read_opened_claims_by_room(session, lodger.room_id)
 
     result = create_get_repair_schemas(repairs)
     return GetRepairScheme(list=result)
 
 
-@repair_router.get(base_url, response_model=GetRepairScheme)
-async def get_room_claims(scheme: RequestFloorRepairScheme, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+@repair_router.get(base_url + "/{floor}", response_model=GetRepairScheme)
+async def get_floor_claims(floor: int, user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     if (user.role != Role.admin):
         raise HTTPException(status_code=403, detail="You are not an admin!")
     
-    repairs = await read_opened_claims_by_floor(session, scheme.floor)
+    repairs = await read_opened_claims_by_floor(session, floor)
 
     result = create_get_repair_schemas(repairs)
     return GetRepairScheme(list=result)
