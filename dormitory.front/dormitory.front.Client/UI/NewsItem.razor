@@ -1,10 +1,12 @@
 ﻿@using dormitory.front.Client.model
 <section class="news-item">
-    <header>@Item.Title</header>
-    <main>@Item.Source</main>
-    <footer>
+    <header>
+        <h1>@Item.Title</h1>
+    </header>
+    <main>@Item.Content</main>
+    @* <footer>
         <a>Узнать больше</a>
-    </footer>
+    </footer> *@
 </section>
 @code {
     [EditorRequired]

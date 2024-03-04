@@ -1,11 +1,13 @@
 ﻿@using dormitory.front.Client.model
 
-<Virtualize Items="@newsList">
-
-</Virtualize>
+<div class ="news-list">
+    <Virtualize  Items="@newsList">
+        <NewsItem Item="@context"></NewsItem>
+    </Virtualize>
+</div>
 @code {
     [EditorRequired]
     [Parameter]
-    public List<NewsItem> newsList { get; set; }
+    public List<NewsItemModel> newsList { get; set; }
 
 }

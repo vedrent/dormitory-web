@@ -1,4 +1,26 @@
 ﻿.news-item
 {
+    font-weight: 600;
+    padding: 20px 40px 30px;
+    margin: 20px;
+    background-color: white;
+    
+}
 
+footer
+{
+    margin-top: 30px;
+    text-align: right;
+
+}
+main
+{
+    font-weight: 500;
+}
+
+a
+{
+    margin-right: 50px;
+    cursor: pointer;
+    font-weight: 700;
 }
