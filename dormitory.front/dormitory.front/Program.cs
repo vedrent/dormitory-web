@@ -1,3 +1,4 @@
+using dormitory.front.Client.model;
 using dormitory.front.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IAccount, Account>();
+
+builder.Services.AddScoped<ICookie, Cookie>();
+builder.Services.AddScoped<IAuth, Auth>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

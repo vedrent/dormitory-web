@@ -1,12 +1,33 @@
-﻿@using dormitory.front.Client.UI
+﻿@using Newtonsoft.Json
+@using dormitory.front.Client.UI
 @using dormitory.front.Client.model
-@page "/"
+@page "/dashboard"
 @rendermode RenderMode.InteractiveWebAssembly
-
-<Navbar/>
+@inject IAuth auth
+@inject NavigationManager Navigation
+@inject IAccount account;
+<Navbar Current="@account.Current"/>
 <Options options=@options/>
 <NewsList newsList="@NewsItems"></NewsList>
 @code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        bool success = await auth.Authorize();
+        if (success)
+        {
+            Console.WriteLine("authorized " + success);
+            Console.WriteLine(JsonConvert.SerializeObject(account));
+            StateHasChanged();
+        }
+        else
+        {
+            account.Clear();
+            Navigation.NavigateTo("/auth");
+        }
+    }
+
     List<OptionModel> options = [
         new OptionModel("Запись на стиральную машину","Встать в очередь","./static/icons/stiralka.png"),
     new OptionModel("Запись на ремонт","Записаться на ремонт","./static/icons/repair.png")

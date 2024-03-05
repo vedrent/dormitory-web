@@ -5,10 +5,13 @@
    </div>
    <div class="account-container">
        <div class="user-icon"></div>
-       <h3>Аккаунт</h3>
+        <h3>@Current.username</h3>
    </div>
 </nav>
 
 @code {
+    [Parameter]
+    [EditorRequired]
+    public AccountModel Current { get; set; }
 
 }
