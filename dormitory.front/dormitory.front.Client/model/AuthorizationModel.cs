@@ -8,28 +8,40 @@ namespace dormitory.front.Client.model;
 
 public interface IAuth
 {
-    public Task<bool> Authorize();
+    public Task<HttpStatusCode> Authorize();
+    public Task Logout();
+
 }
 public class Auth : IAuth
 {
     readonly ICookie cookie;
     readonly HttpClient httpClient;
     readonly IAccount account;
-    public Auth(ICookie cookie, HttpClient httpClient, IAccount account)
+    readonly NavigationManager navigation;
+    public Auth(ICookie cookie, HttpClient httpClient, IAccount account, NavigationManager navigation)
     {
         this.cookie = cookie;
         this.httpClient = httpClient;
         this.account = account;
+        this.navigation = navigation;
+
     }
-    public async Task<bool> Authorize()
+    public async Task<HttpStatusCode> Authorize()
     {
         AuthorizationModel model = await ReadTokenAsync();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", model.access_token);
         var responseAuth = await httpClient.GetAsync("http://localhost:6981/whoami");
         var jsonResponse = await responseAuth.Content.ReadAsStringAsync();
         account.Current = JsonConvert.DeserializeObject<AccountModel>(jsonResponse);
-        return responseAuth.IsSuccessStatusCode;
+        return responseAuth.StatusCode;
         
+    }
+    public async Task Logout()
+    {
+        await cookie.SetValueAsync("access_token", "", days: 0);
+        await cookie.SetValueAsync("refresh_token", "", days: 0);
+        account.Clear();
+        navigation.NavigateTo("/auth");
     }
     async Task<AuthorizationModel> ReadTokenAsync()
     {

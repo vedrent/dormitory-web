@@ -1,13 +1,22 @@
 ﻿@using dormitory.front.Client.model
-<section class="news-item">
+@using Blazorise
+@* <section class="news-item">
     <header>
         <h1>@Item.Title</h1>
     </header>
     <main>@Item.Content</main>
-    @* <footer>
-        <a>Узнать больше</a>
-    </footer> *@
-</section>
+   
+</section> *@
+<Card Margin="Margin.Is2.FromBottom" Background="Background.Light">
+    <CardBody>
+        <CardTitle Size="3">
+            @Item.Title
+        </CardTitle>
+        <CardText>
+            @Item.Content
+        </CardText>
+    </CardBody>
+</Card>
 @code {
     [EditorRequired]
     [Parameter]

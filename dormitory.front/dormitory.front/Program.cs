@@ -1,3 +1,6 @@
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using dormitory.front.Client.model;
 using dormitory.front.Components;
 
@@ -13,6 +16,13 @@ builder.Services.AddSingleton<IAccount, Account>();
 builder.Services.AddScoped<ICookie, Cookie>();
 builder.Services.AddScoped<IAuth, Auth>();
 
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+    })
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

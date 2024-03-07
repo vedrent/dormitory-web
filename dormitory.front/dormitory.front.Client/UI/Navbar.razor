@@ -1,17 +1,48 @@
-﻿<nav>
-   <div class="header-container">
-       <div class="app-icon"></div>
-       <h1>Экосистема общежития МИРЭА</h1>
-   </div>
-   <div class="account-container">
-       <div class="user-icon"></div>
-        <h3>@Current.username</h3>
-   </div>
-</nav>
-
+﻿@using Blazorise
+@inject IAccount account
+@inject IAuth auth
+<Bar  Breakpoint="Breakpoint.Desktop">
+    <Image Source="./static/icons/logo.png" Style="height: 30px"></Image>
+    <BarStart Margin="Margin.Is3.FromStart">
+        <BarBrand>
+            Система общежития
+        </BarBrand>
+    </BarStart>
+    <BarEnd Margin="Margin.Is5.FromEnd">
+        <BarMenu>
+            <BarItem>
+                <BarDropdown>
+                    <BarDropdownToggle>
+                        <BarIcon IconName="IconName.User" Margin="Margin.Is1.FromEnd"></BarIcon>
+                        @account.Current.username
+                    </BarDropdownToggle>
+                    <BarDropdownMenu>
+                        <BarDropdownItem>
+                            <BarMenu>
+                                <BarIcon IconName="IconName.Info" Margin="Margin.Is1.FromEnd"></BarIcon>
+                                <BarLabel>Инфо</BarLabel>
+                            </BarMenu>
+                        </BarDropdownItem>
+                        <BarDropdownDivider />
+                        <BarDropdownItem onclick="@onAttemptToLogout">
+                            <BarMenu>
+                                <BarIcon IconName="IconName.Times" Margin="Margin.Is2.FromEnd"></BarIcon>
+                                <BarLabel>Выйти</BarLabel>
+                            </BarMenu>
+                        </BarDropdownItem>
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+        </BarMenu>
+    </BarEnd>   
+</Bar>
 @code {
     [Parameter]
     [EditorRequired]
     public AccountModel Current { get; set; }
 
+    private void onAttemptToLogout()
+    {
+        auth.Logout();
+    }
 }

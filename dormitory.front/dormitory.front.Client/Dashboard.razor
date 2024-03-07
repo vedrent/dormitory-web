@@ -1,42 +1,71 @@
 ﻿@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Net
 @using dormitory.front.Client.UI
 @using dormitory.front.Client.model
+@using Blazorise
+@page "/"
 @page "/dashboard"
 @rendermode RenderMode.InteractiveWebAssembly
 @inject IAuth auth
 @inject NavigationManager Navigation
 @inject IAccount account;
+@inject HttpClient httpClient;
 <Navbar Current="@account.Current"/>
-<Options options=@options/>
+<Options options="@options"></Options>
 <NewsList newsList="@NewsItems"></NewsList>
 @code {
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+
         if (!firstRender) return;
-        bool success = await auth.Authorize();
-        if (success)
+
+        /* check login and load user data*/
+
+        HttpStatusCode authResultCode = await auth.Authorize();
+        if (authResultCode == HttpStatusCode.OK)
         {
-            Console.WriteLine("authorized " + success);
+            Console.WriteLine("authorized");
             Console.WriteLine(JsonConvert.SerializeObject(account));
             StateHasChanged();
         }
         else
         {
-            account.Clear();
-            Navigation.NavigateTo("/auth");
+            await auth.Logout();
+            return;
+        } 
+        /* load news */
+        var response = await httpClient.GetAsync("http://localhost:6981/news");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            await auth.Logout();
+            return;
         }
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var rawNews = JObject.Parse(jsonString);
+        Console.WriteLine(jsonString);
+        NewsItems = rawNews["items"].Select(item =>
+            new NewsItemModel((string)item["title"],
+            (string)item["content"],
+            (string)item["source"])).ToList();
+
+        StateHasChanged();
     }
 
     List<OptionModel> options = [
-        new OptionModel("Запись на стиральную машину","Встать в очередь","./static/icons/stiralka.png"),
-    new OptionModel("Запись на ремонт","Записаться на ремонт","./static/icons/repair.png")
+    new OptionModel("Стирка","Встать в очередь","./static/icons/stiralka.png"),
+    new OptionModel("Ремонт","Оставить заявку","./static/icons/repair.png"),
+    new OptionModel("Комендант","Написать","./static/icons/skull.png")
+
     ];
     List<NewsItemModel> NewsItems =
-    [
+    [ 
+            /*
         new NewsItemModel("Новость хуета", """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""", "#"),
     new NewsItemModel("Новость красота", """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""", "#"),
     new NewsItemModel("Новость говно", """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""", "#")
-
+    */
     ];
 }

@@ -1,10 +1,4 @@
-﻿.service-icon {
-    background-repeat: no-repeat;
-    background-size: contain;
-    width: 330px;
-    height: 212px;
-    margin: auto 0;
-}
+﻿
 
 
 .service-title {
@@ -23,8 +17,9 @@
     border-radius: 20px;
     cursor: pointer;
     height: fit-content;
-    font-size: 26px;
+    font-size: 18px;
     font-weight: bold;
+    color: black;
 }
 
 .service-text {
@@ -43,29 +38,9 @@
     width: 10px;
 }
 
-.slide-button {
-    position: absolute;
-    display: block;
-    height: 100px;
-    width: 100px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    margin: 20px 20px;
-    box-sizing: border-box;
-    padding: 20px;
-    background-color: transparent;
-}
 
-.left {
-    left: 0;
-    background-image: url("./static/icons/arrLeft.png");
 
-}
-.right {
-    right: 0;
-    background-image: url("./static/icons/arrRight.png");
-}
+
 
 button
 {

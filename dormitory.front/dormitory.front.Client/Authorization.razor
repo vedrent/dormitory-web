@@ -3,62 +3,94 @@
 
 @using Newtonsoft.Json;
 @using System.Net.Http.Headers
+@using System.Net
 @using dormitory.front.Client.model
-
+@using Blazorise
 @inject IJSRuntime jsRuntime;
 @inject HttpClient httpClient;
 @inject ICookie cookie;
 @inject NavigationManager Navigation;
 @inject IAuth auth;
 @inject IAccount account;
+
 <EditForm id="auth-form" Model="authData" OnSubmit="@Submit" FormName="auth-form">
-    <div class="app-icon auth-icon"></div>
-    <h1>Авторизация</h1>
-    <section class="input-group">
-        <InputText placeholder="Логин"  @bind-Value="authData.username" style="border-bottom: 2px solid var(--gray)" />
-        <InputText placeholder="Пароль" type="password" @bind-Value="authData.password" />
-    </section>
-    <button type="submit" id="submit" class="submit-button">Войти</button>
-    <a href="/signup" class="submit-button">Создать аккаунт</a>
-    <footer>
-        <div class="app-icon"></div>
-        <a>Техническая поддержка </a>
-        <span>&copy; 2024 - Crazy developers</span>
-    </footer>
+    <Card Padding="Padding.Is4">
+        @* <Image Source="./static/icons/logo.png" Height="Height.Px(100)"
+                   Style="margin:auto; display: block">
+        </Image> *@
+        <Figure Size="FigureSize.Is128x128"  Style="margin:auto; display: block">
+            <FigureImage Source="./static/icons/logo.png">
+            </FigureImage>
+        </Figure>
+        <CardTitle TextSize="TextSize.Heading2"
+                   TextAlignment="TextAlignment.Center"
+                   TextWeight="TextWeight.SemiBold">
+            Авторизация
+        </CardTitle>
+        <CardBody>
+
+            <TextEdit Placeholder="Логин" @bind-Text="authData.username" Style="margin-bottom: 15px !important"/>
+            
+            <TextEdit Placeholder="Пароль" Role="TextRole.Password" @bind-Text="authData.password" />
+
+            @* <button type="submit" id="submit" class="submit-button">Войти</button> *@
+            <Button type="@ButtonType.Submit" Color="Color.Primary" Size="Size.Large" Block Style="margin-top: 20px" onclick="@Submit">Войти</Button>
+            @* <footer>
+            <div class="app-icon"></div>
+            <a>Техническая поддержка </a>
+            <span>&copy; 2024 - Crazy developers</span>
+            </footer> *@
+
+        </CardBody>
+        <Alert Color="Color.Danger" @ref="wrongAuthAlert">
+            <AlertMessage>Ошибка:</AlertMessage>
+            <AlertDescription>Неправильный логин или пароль</AlertDescription>
+            <CloseButton></CloseButton>
+        </Alert>
+    </Card>
+    <Field Position="Position.Absolute.Bottom.Is0.Start.Is50.Translate.MiddleX" Style="margin-bottom: 50px">
+        
+       <Link Style="cursor: pointer">
+        <Icon Name="IconName.Headphones"></Icon> Техническая поддержка</Link>
+       <Span>&copy; 2024 - Crazy developers</Span>
+    </Field>
+
 </EditForm>
 
 <style>
     #auth-form {
-        width: 400px;
+        width: 32%;
+        min-width: 350px;
         margin: 0 auto;
-        padding: 50px 0;
-        position: relative;
         height: 100%;
-        
+        padding: 100px 0
     }
 
-    input {
+  /*   input {
         all: unset;
         font-size: 18px;
         padding: 0.4em;
+    } */
+    html, body
+    {
+        height:100%;
     }
-
 
 </style>
 
 @code {
 
     AuthData authData = new();
-
+    Alert wrongAuthAlert;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
 
-        bool success = await auth.Authorize();
+        HttpStatusCode authResultCode = await auth.Authorize();
         account.Current = account.Current;
-        if (success)
+        if (authResultCode == HttpStatusCode.OK)
         {
-            Navigation.NavigateTo("/dashboard");
+            Navigation.NavigateTo("/dashboard");    
         }
         else
         {
@@ -69,15 +101,25 @@
     async Task Submit()
     {
         Console.WriteLine("Submit started");
+        Console.WriteLine(JsonConvert.SerializeObject(authData));
         var response = await httpClient.PostAsJsonAsync("http://localhost:6981/login", authData);
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
 
-        AuthorizationModel? model = JsonConvert.DeserializeObject<AuthorizationModel>(jsonResponse);
+            AuthorizationModel? model = JsonConvert.DeserializeObject<AuthorizationModel>(jsonResponse);
 
-        await WriteTokenAsync(model);
+            await WriteTokenAsync(model);
 
-        Navigation.NavigateTo("/dashboard");
+            Navigation.NavigateTo("/dashboard");
+        }
+        else
+        {
+            wrongAuthAlert.Show();
+            return;
+        }
+        
     }
 
     async Task WriteTokenAsync(AuthorizationModel? model)

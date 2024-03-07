@@ -1,52 +1,43 @@
 ﻿@using dormitory.front.Client.model
 @rendermode RenderMode.InteractiveWebAssembly
+@using Blazorise;
 
-    
-<div class="service">
-    <button class="slide-button left" @onclick=switchLeft></button>
-    <div class="service-icon" style="background-image: url(@currentOption.IconUrl)"></div>
-    <div class="service-text">
-        <div class="service-title">@currentOption.Title</div>
-        <a class="service-button"> <span class="form-icon"></span>@currentOption.Description</a>
-    </div>
-    <button class="slide-button right" @onclick=switchRight></button>
-</div>
-<style>
-    .service {
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient( 90deg, #97cde4, #9ce497);
-        margin-bottom: 10px;
-        padding: 20px;
-        border-radius: 10px;
-        display: flex;
-        position:relative;
-    }
+<Carousel @bind-SelectedSlide="@selectedSlide" Interval="3000" AutoRepeat="false">
+    <Repeater TItem="OptionModel" Items="@options">
+        <CarouselSlide Name="@options.IndexOf(context).ToString()" >
+            <div class="service">
+                @* <div class="service-icon" style="background-image: url(@context.IconUrl)"></div> *@
+                <Image Source="@context.IconUrl" Style="height: 110px" Margin="Margin.Is5.FromEnd"></Image>
+                <div class="service-text">
+                    <div class="service-title">@context.Title</div>
+                    <a class="service-button"> <span class="form-icon"></span>@context.Description</a>
+                </div>
+            </div>
+            <style>
+                .service {
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient( 90deg, #97cde4, #9ce497);
+                    margin-bottom: 10px;
+                    padding: 40px;
+                    border-radius: 10px;
+                    display: flex;
+                    position: relative;
+                }
+            </style>
+        </CarouselSlide>
+    </Repeater>
+     
+</Carousel>
 
-</style>
-
-@code{
+@code
+{
     [Parameter]
     [EditorRequired]
-    public List<OptionModel> options {get; set;}
-    OptionModel currentOption;
-    int currentOptionIndex = 0;
-    protected override void OnInitialized()
-    {
-        currentOption = options[currentOptionIndex];
-    }
+    public List<OptionModel> options { get; set; }
+    string selectedSlide = "0";
 
-    void switchRight()
-    {
-        currentOptionIndex++;
-        currentOptionIndex %= options.Count;
-        currentOption = options[currentOptionIndex];
-    }
-    void switchLeft()
-    {
-        currentOptionIndex--;
-        if (currentOptionIndex < 0) currentOptionIndex = options.Count - 1;
-        currentOption = options[currentOptionIndex];
-    }
 }
 
+
+    

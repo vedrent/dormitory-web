@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\dormitory.front.Client\dormitory.front.Client.csproj" />
+    <PackageReference Include="Blazorise.Bootstrap" Version="1.4.2" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
   </ItemGroup>
 
