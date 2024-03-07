@@ -67,13 +67,19 @@ async def update_washer_status(session: AsyncSession, washer: Washer, status: in
     await session.commit()
 
 
-async def start_washering(session: AsyncSession, washer_id: int):
+async def start_washing(session: AsyncSession, washer_id: int):
     proccess = select(Washer_Queue).where(Washer_Queue.washer_id == None)
     proccess = await session.execute(proccess)
     proccess = proccess.scalars().first()
 
     if (not proccess):
         return
+
+    washer = select(Washer).where(Washer.id == washer_id)
+    washer = await session.execute(washer)
+    washer = washer.scalars().first()
+    
+    await update_washer_status(session, washer, 2)
     
     proccess.washer_id = washer_id
     session.add(proccess)

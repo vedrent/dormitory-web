@@ -6,6 +6,7 @@ class Role(str, Enum):
     user = "user"
     company = "company"
     moderator = "moderator"
+    
 
 class AuthUser(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
