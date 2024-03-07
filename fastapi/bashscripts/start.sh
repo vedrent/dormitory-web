@@ -17,6 +17,7 @@ if [ ! -f "$ENV_FILE" ]; then
     echo "PGADMIN_DEFAULT_EMAIL=admin@admin.ru" >> "$ENV_FILE"
     echo "PGADMIN_DEFAULT_PASSWORD=password" >> "$ENV_FILE"
 
+    echo "REPAIR_CLAIMS_LIMIT=3" >> "$ENV_FILE"
 
     echo ".env файл создан."
 fi
