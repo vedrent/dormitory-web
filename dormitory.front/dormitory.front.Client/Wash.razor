@@ -13,7 +13,7 @@
         <Button Clicked="@(goToDashboard)" Size="@Size.Large" Position="Position.Absolute.End.Is0.Top.Is0" Color="Color.Danger">
             <Icon Name="IconName.Times" ></Icon>
         </Button>
-        <Figure Size="FigureSize.Is128x128" Style="margin: 10px auto; display: block;">
+        <Figure Size="FigureSize.Is64x64" Style="margin: 10px auto; display: block;">
             <FigureImage Source="./static/icons/stiralka.png" Style="padding: 1px; margin: 1px">
             </FigureImage>
         </Figure>
@@ -36,18 +36,18 @@
             </TableBody>
         </Table>
 
-        @if(QueueStatus == 0)
+        @if(QueuePosition == -1)
         {
             <Button Size="Size.ExtraLarge" Color="Color.Primary" Style="margin: 0 auto; display: block"
                     Clicked="@onAttemptToEnterQueue">
                 Встать в очередь
             </Button>
         }
-        else if (QueueStatus > 0)
+        else if (QueuePosition >= 0)
         {
             <Button Size="Size.ExtraLarge" Color="Color.Danger" Style="margin: 0 auto; display: block"
                     Clicked="@showShutdownModal">
-                Завершить
+                Покинуть очередь
             </Button>
 
             <Modal @ref=@confirmShutdown>
@@ -64,12 +64,32 @@
                 </ModalContent>
             </Modal>
         }
-
-
     </LayoutContent>
     <LayoutFooter Style="margin: 20px 0; text-align: center">
-        <p>Данные обновляются с задержкой 10с.</p>
-        <p>Пожалуйста, не забудьте освободить очередь после завершения стирки.</p>
+        @if (QueuePosition > 0)
+        {
+            <Alert Color="Color.Warning" Visible>
+                <AlertMessage>
+                    Ваш номер в очереди: @QueuePosition
+                </AlertMessage>
+            </Alert>
+            <Alert Color="Color.Warning" Visible>
+                <AlertDescription>
+                    Когда ваш номер станет 0, вы сможете воспользоваться машиной.
+                </AlertDescription>
+            </Alert>
+        }
+        @if (QueuePosition == 0)
+        {
+            <Alert Color="Color.Success" Visible>
+                <AlertMessage>Ваша очередь!</AlertMessage>
+                <AlertDescription>Можете занять машину № @OccupiedWasherId</AlertDescription>
+            </Alert>
+            <Alert Color="Color.Warning" Visible>
+                <AlertMessage>Пожалуйста, не забудьте освободить очередь после завершения стирки.</AlertMessage>
+            </Alert>
+        }
+
     </LayoutFooter>
 </Layout>
 @code {
@@ -94,7 +114,7 @@
             await auth.Logout();
             return;
         }
-        QueueStatus = 1;
+        QueuePosition = 1;
         await updateWashData();
         StateHasChanged();
     }
@@ -107,7 +127,7 @@
             await auth.Logout();
             return;
         }
-        QueueStatus = 0;
+        QueuePosition = 0;
         await updateWashData();
         StateHasChanged();
     }
@@ -145,6 +165,9 @@
 
         string washersJson = await laundryResponse.Content.ReadAsStringAsync();
         washers = JObject.Parse(washersJson)["washers"].Select(washer => new Washer((int)washer["id"], (int)washer["status"])).OrderBy(washer => washer.id).ToList();
+        OccupiedWasherId = (int)JObject.Parse(washersJson)["occupied_washer_id"].Value<int>();
+        QueuePosition = JObject.Parse(washersJson)["queue_position"].Value<int>();
+        
         Console.WriteLine(JsonConvert.SerializeObject(washers));
         StateHasChanged();
     }
@@ -181,9 +204,9 @@
     ];
 
     /// <summary>
-    /// 0 - not in queue, 1 - in queue
+    /// -1 - not in queue, 0 - your turn, >0 - position in queue
     /// </summary>
-    int QueueStatus = 0;
-
+    int QueuePosition = -1;
+    int OccupiedWasherId = -1;
     Modal confirmShutdown;
 }
