@@ -2,7 +2,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.database import get_session
-from src.laundry.utils import read_washers, read_queue_position, insert_washer_queue, check_user_in_queue, delete_washer_queue, start_washing
+from src.laundry.utils import read_washers, read_queue_position, insert_washer_queue, check_user_in_queue, delete_washer_queue, start_washing, read_occupied_by_user_washer
 
 from src.auth.models import AuthUser
 from src.auth.dependencies import get_current_user
@@ -16,8 +16,10 @@ laundry_router = APIRouter(tags=["laundry"])
 async def check_washer(user: AuthUser = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     washers = await read_washers(session)
     pos = await read_queue_position(session, user)
+    washer_id = await read_occupied_by_user_washer(session, user)
+
     
-    return LaundryGetScheme(washers = washers, queue_position = pos)
+    return LaundryGetScheme(washers = washers, queue_position = pos, occupied_washer_id = washer_id)
 
 
 @laundry_router.post("/laundry")

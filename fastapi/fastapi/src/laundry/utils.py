@@ -34,6 +34,16 @@ async def read_queue_position(session: AsyncSession, user: AuthUser) -> int:
         return waiters.index(user.id) + 1
     else:
         return -1
+    
+
+async def read_occupied_by_user_washer(session: AsyncSession, user: AuthUser) -> int:
+    washer_id = select(Washer_Queue.washer_id).where(Washer_Queue.user_id == user.id)
+    washer_id = await session.execute(washer_id)
+    washer_id = washer_id.scalars().first()
+
+    if (not washer_id):
+        return -1
+    return washer_id
 
 
 async def insert_washer_queue(session: AsyncSession, user: AuthUser):
