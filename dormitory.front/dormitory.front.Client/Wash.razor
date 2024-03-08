@@ -1,0 +1,189 @@
+﻿@using Blazorise
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Net;
+@rendermode InteractiveWebAssembly
+@page "/wash"
+@inject HttpClient httpClient;
+@inject IAuth auth;
+@inject NavigationManager Navigation;
+<Layout Padding="Padding.Is5">
+    
+    <LayoutHeader Position="Position.Relative">
+        <Button Clicked="@(goToDashboard)" Size="@Size.Large" Position="Position.Absolute.End.Is0.Top.Is0" Color="Color.Danger">
+            <Icon Name="IconName.Times" ></Icon>
+        </Button>
+        <Figure Size="FigureSize.Is128x128" Style="margin: 10px auto; display: block;">
+            <FigureImage Source="./static/icons/stiralka.png" Style="padding: 1px; margin: 1px">
+            </FigureImage>
+        </Figure>
+    </LayoutHeader>
+    <LayoutContent>
+        <Table  Bordered Width=" Width.Px(300)"  Style="margin: 40px auto">
+            <TableHeader ThemeContrast=ThemeContrast.Light>
+                <TableRow>
+                    <TableHeaderCell Width="Width.Px(100)">№</TableHeaderCell>
+                    <TableHeaderCell Width="Width.Px(200)">Статус</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                <Repeater Items="@washers">
+                    <TableRow>
+                        <TableRowHeader >@context.id</TableRowHeader>
+                        <TableRowCell Color="@getStatusColor(context.status)">@getStatusText(context.status)</TableRowCell>
+                    </TableRow>
+                </Repeater>
+            </TableBody>
+        </Table>
+
+        @if(QueueStatus == 0)
+        {
+            <Button Size="Size.ExtraLarge" Color="Color.Primary" Style="margin: 0 auto; display: block"
+                    Clicked="@onAttemptToEnterQueue">
+                Встать в очередь
+            </Button>
+        }
+        else if (QueueStatus > 0)
+        {
+            <Button Size="Size.ExtraLarge" Color="Color.Danger" Style="margin: 0 auto; display: block"
+                    Clicked="@showShutdownModal">
+                Завершить
+            </Button>
+
+            <Modal @ref=@confirmShutdown>
+                <ModalContent Centered>
+                    <ModalHeader>
+                        <ModalTitle>Внимание</ModalTitle>
+                        <CloseButton />
+                    </ModalHeader>
+                    <ModalBody>Вы действительно хотите покинуть очередь?</ModalBody>
+                    <ModalFooter>
+                        <Button Color="Color.Danger" Clicked="@onAttemptToExitQueue">Освободить очередь</Button>
+                        <Button Color="Color.Primary" Clicked="@hideShutdownModal">Остаться</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        }
+
+
+    </LayoutContent>
+    <LayoutFooter Style="margin: 20px 0; text-align: center">
+        <p>Данные обновляются с задержкой 10с.</p>
+        <p>Пожалуйста, не забудьте освободить очередь после завершения стирки.</p>
+    </LayoutFooter>
+</Layout>
+@code {
+    void goToDashboard()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+    void showShutdownModal()
+    {
+        confirmShutdown.Show();
+    }
+    void hideShutdownModal()
+    {
+        confirmShutdown.Hide();
+    }
+    async Task onAttemptToEnterQueue()
+    {
+        var httpResponse = await httpClient.PostAsync("http://localhost:6981/laundry", null);
+        Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
+        if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            await auth.Logout();
+            return;
+        }
+        QueueStatus = 1;
+        await updateWashData();
+        StateHasChanged();
+    }
+    async Task onAttemptToExitQueue()
+    {
+        var httpResponse = await httpClient.PutAsync("http://localhost:6981/laundry", null);
+        Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
+        if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            await auth.Logout();
+            return;
+        }
+        QueueStatus = 0;
+        await updateWashData();
+        StateHasChanged();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await updateWashData();
+        using (PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5)))
+        {
+            while (await timer.WaitForNextTickAsync())
+            {
+                await updateWashData();
+            }
+        }
+    }
+    /// <summary>
+    /// gets washer data from server each 10s
+    /// </summary>
+    /// <returns></returns>
+    async Task updateWashData()
+    {
+        if (await auth.Authorize() != HttpStatusCode.OK)
+        {
+            await auth.Logout();
+            return;
+        }
+
+        HttpResponseMessage laundryResponse = await httpClient.GetAsync("http://localhost:6981/laundry");
+
+        if (!laundryResponse.IsSuccessStatusCode)
+        {
+            await auth.Logout();
+            return;
+        }
+
+        string washersJson = await laundryResponse.Content.ReadAsStringAsync();
+        washers = JObject.Parse(washersJson)["washers"].Select(washer => new Washer((int)washer["id"], (int)washer["status"])).OrderBy(washer => washer.id).ToList();
+        Console.WriteLine(JsonConvert.SerializeObject(washers));
+        StateHasChanged();
+    }
+
+    string getStatusText(int status)
+    {
+        switch (status)
+        {
+            case 1:
+                return "Готова";
+            case 2:
+                return "Занята";
+            default:
+                return "Сломана";
+        }
+    }
+    Color getStatusColor(int status)
+    {
+        switch (status)
+        {
+            case 1:
+                return Color.Success;
+            case 2:
+                return Color.Dark;
+            default:
+                return Color.Danger;
+        }
+    }
+    List<Washer> washers = [
+    new (1, 0),
+    new (2, 0),
+    new (3, 0),
+    new (4, 0)
+    ];
+
+    /// <summary>
+    /// 0 - not in queue, 1 - in queue
+    /// </summary>
+    int QueueStatus = 0;
+
+    Modal confirmShutdown;
+}
