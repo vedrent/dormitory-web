@@ -79,6 +79,7 @@
 </style>
 
 @code {
+   
 
     AuthData authData = new();
     Alert wrongAuthAlert;
@@ -98,7 +99,7 @@
         }
     }
 
-    async Task Submit()
+    async Task Submit() 
     {
         Console.WriteLine("Submit started");
         Console.WriteLine(JsonConvert.SerializeObject(authData));
