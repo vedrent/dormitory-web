@@ -8,6 +8,7 @@ DUMP_PATH_IN_CONTAINER="/tmp/${DUMP_FILE}"
 
 create_dump() {
     echo "Creating dump of all tables from the PostgreSQL database inside the container..."
+    docker exec $CONTAINER_NAME touch $DUMP_PATH_IN_CONTAINER
     docker exec $CONTAINER_NAME pg_dump -U $DB_USER -d $DB_NAME -f $DUMP_PATH_IN_CONTAINER
     docker cp $CONTAINER_NAME:$DUMP_PATH_IN_CONTAINER ./
     echo "Dump created successfully and copied to local machine: $DUMP_FILE"
