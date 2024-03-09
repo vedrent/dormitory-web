@@ -18,3 +18,11 @@
     - docker compose exec fastapi alembic upgrade head
 3. Применить конкретную миграцию
     - docker compose exec fastapi alembic upgrade / downgrade <revision identifier>
+
+## Простое копирование дампов
+1. Переходите в папку fastapi
+    - `cd ./fastapi`
+2. Запускаете скрипт для создания дампа
+    - `sh ./bashscripts/dump.sh`
+3. Если вам надо восстановить дамп
+    - `sh ./bashscripts/dump.sh --restore`
